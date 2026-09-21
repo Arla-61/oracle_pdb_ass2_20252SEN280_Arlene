@@ -11,11 +11,10 @@
 
 A new PDB is cloned from the seed database (PDB$SEED) using CREATE PLUGGABLE DATABASE, with FILE_NAME_CONVERT mapping the seed's datafile paths to the new PDB's own directory.
 
-sql
--- Check seed database datafiles
+sql used:
+
 SELECT con_id, name FROM v$datafile WHERE con_id = 2;
 
--- Create the new pluggable database from the seed
 CREATE PLUGGABLE DATABASE ar_pdb_20252SEN280
   ADMIN USER pdbadmin IDENTIFIED BY PdbAdmin123
   FILE_NAME_CONVERT = (
@@ -23,7 +22,6 @@ CREATE PLUGGABLE DATABASE ar_pdb_20252SEN280
     'C:\ORACLE_21C\ORADATA\ORCL\ar_pdb_20252SEN280'
   );
 
--- Confirm the PDB now exists (initially in MOUNTED state)
 SHOW PDBS; 
 
 The Output is :
@@ -34,24 +32,20 @@ The Output is :
 
 Once created, a PDB must be opened (READ WRITE) before it can be used. The session is then switched into the PDB's container to create a local user and grant the privileges needed to connect and build objects.
 
-sql
--- Open the PDB for read/write access
+sql used :
+
 ALTER PLUGGABLE DATABASE ar_pdb_20252SEN280 OPEN;
 SHOW PDBS;
 
--- Switch session context into the new PDB
 ALTER SESSION SET CONTAINER = ar_pdb_20252SEN280;
 SHOW CON_NAME;
 
--- Create a local user inside the PDB
 CREATE USER arlene_plsqlauca_20252SEN280 IDENTIFIED BY Arlene123;
 
--- Grant privileges
 GRANT CREATE SESSION   TO arlene_plsqlauca_20252SEN280;
 GRANT CREATE TABLE     TO arlene_plsqlauca_20252SEN280;
 GRANT CREATE PROCEDURE TO arlene_plsqlauca_20252SEN280;
 
--- Verify the user exists
 SELECT username FROM dba_users
 WHERE username = 'ARLENE_PLSQLAUCA_20252SEN280';
 
@@ -63,18 +57,15 @@ The output is :
 
 To remove a PDB entirely (including its underlying datafiles), the session must return to CDB$ROOT, close the PDB, then drop it.
 
-sql
--- Return to the root container
+sql used :
+
 ALTER SESSION SET CONTAINER = CDB$ROOT;
 SHOW PDBS;
 
--- Close the PDB before dropping it
 ALTER PLUGGABLE DATABASE ar_pdb_20252SEN280 CLOSE IMMEDIATE;
 
--- Drop the PDB and remove its datafiles from disk
 DROP PLUGGABLE DATABASE ar_pdb_20252SEN280 INCLUDING DATAFILES;
 
--- Confirm removal
 SHOW PDBS;
 SELECT pdb_name FROM cdb_pdbs WHERE pdb_name = 'AR_PDB_20252SEN280';
 
@@ -84,4 +75,17 @@ The output is :
 
 ## Monitoring in Oracle Enterprise Manager (OEM)
 
-The pluggable Database created is showed in the dashboard and the user created is showed bellow 
+The pluggable Database created is showed in the dashboard and the user created is shown bellow is the username bar
+
+the output is :
+
+
+<img width="935" height="508" alt="OEM Dashboard" src="https://github.com/user-attachments/assets/13d42c1d-9cfa-453e-ba23-c2b1fbfbe504" />
+
+## Challenge faced
+
+The challenge I met with is to make user created appear on the dashboard of OEM  but  I checked again and refreshed the page and there it was on 
+
+## Integrity Statement
+
+I hereby declare that the work presented in this report including the creation, configuration, user management, and deletion of the pluggable database AR_PDB_20252SEN280, as well as the accompanying screenshots and documentation and I assure you that I have done it on my own without copying my collegues' works 
